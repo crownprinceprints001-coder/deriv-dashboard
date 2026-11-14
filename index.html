@@ -1,0 +1,254 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deriv Dashboard</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+  body{background:#0e1117;color:white;padding:20px}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px}
+  h1{font-size:22px;color:#ff444f}
+  .topbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .pill{padding:8px 14px;border-radius:20px;border:1px solid #333;background:#1a1f2e;color:white;cursor:pointer;font-size:13px}
+  .pill.active{background:#ff444f;border-color:#ff444f}
+  .login-top{background:#ff444f;color:white;padding:9px 18px;border-radius:20px;border:none;font-weight:bold;cursor:pointer;font-size:13px;width:auto}
+  .login-top.logged{background:#333;color:#aaa}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
+  .card{background:#1a1f2e;padding:20px;border-radius:12px;text-align:center}
+  .card small{color:#aaa}.card b{font-size:22px;display:block;margin-top:5px}
+  .green{color:#4caf50}.red{color:#ff444f}
+  .box{background:#1a1f2e;padding:20px;border-radius:12px;margin-bottom:15px}
+  input,select{width:100%;padding:12px;margin:8px 0;background:#0e1117;border:1px solid #333;color:white;border-radius:8px}
+  button{width:100%;padding:14px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:8px}
+  .start{background:#4caf50;color:white}.stop{background:#ff444f;color:white}
+  .deposit{background:#2196f3;color:white}.withdraw{background:#ff9800;color:white}.connect{background:#ff444f;color:white}.logout{background:#333;color:white}
+  .flex{display:flex;gap:10px}.flex button{flex:1}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  td,th{padding:10px;text-align:left;border-bottom:1px solid #333;font-size:14px}
+  .digits{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:15px;text-align:center}
+  .digit-item small{color:#aaa;font-size:12px;display:block;margin-top:5px}
+  .circle{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;color:white;margin:0 auto;transition:all .3s}
+  .c-neutral{background:#607d8b}
+  .c-most{background:#4caf50;box-shadow:0 0 15px #4caf50;transform:scale(1.12)}
+  .c-second-most{background:#2196f3;box-shadow:0 0 12px #2196f3;transform:scale(1.06)}
+  .c-least{background:#ff444f;box-shadow:0 0 15px #ff444f}
+  .c-second-least{background:#ffeb3b;color:#111;box-shadow:0 0 12px #ffeb3b}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px;font-size:12px;color:#aaa}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:4px}
+  .signal{padding:12px;border-radius:8px;text-align:center;font-weight:bold;margin-top:10px}
+  .signal.buy{background:#123d22;color:#4caf50}.signal.sell{background:#3d1212;color:#ff444f}.signal.wait{background:#2a2a2a;color:#aaa}
+  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#111;padding:14px 20px;border-radius:10px;font-weight:bold;display:none;z-index:99;max-width:90%;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DERIV DASHBOARD</h1>
+  <div class="topbar">
+    <button class="pill active" id="demoBtn" onclick="switchAccount('DEMO')" style="width:auto">DEMO</button>
+    <button class="pill" id="realBtn" onclick="switchAccount('REAL')" style="width:auto">REAL</button>
+    <button class="pill" onclick="toggleNotify()" id="notifyBtn" style="width:auto">🔔 ON</button>
+    <button class="login-top" id="headerLoginBtn" onclick="handleHeaderLogin()">LOG IN</button>
+  </div>
+</header>
+
+<div class="box" style="border:1px solid #ff444f;text-align:center">
+  <h3>🔗 Login With Deriv</h3>
+  <p id="apiStatus" style="color:#aaa;margin:8px 0">Not logged in</p>
+  <p style="font-size:12px;color:#aaa">Account: <b id="loginId" style="color:white">-</b> | Live Price: <b id="livePrice" style="color:white">-</b></p>
+  <div id="loginArea">
+    <button class="connect" onclick="loginWithDeriv()">LOGIN WITH DERIV</button>
+  </div>
+  <div id="logoutArea" style="display:none">
+    <button class="logout" onclick="logoutDeriv()">LOG OUT</button>
+  </div>
+</div>
+
+<div class="cards">
+  <div class="card"><small>Balance <span id="accLabel">DEMO</span></small><b id="balance">$1,000.00</b><small id="balanceKsh">≈ KSh 129,000</small></div>
+  <div class="card"><small>Profit Today</small><b class="green" id="profit">+$0.00</b><small id="profitKsh">≈ KSh 0</small></div>
+  <div class="card"><small>Total Trades</small><b id="trades">0</b></div>
+  <div class="card"><small>Win Rate</small><b id="winrate">0%</b></div>
+</div>
+
+<div class="box">
+  <h3>USD → KSH Converter</h3>
+  <label>USD Rate (1 USD = KSH)</label>
+  <input type="number" id="rate" value="129" oninput="updateKsh()">
+  <label>Amount in USD</label>
+  <input type="number" id="usdAmt" value="10" oninput="updateKsh()">
+  <p style="text-align:center;margin-top:8px"><b id="kshOut">KSh 1,290</b></p>
+  <div class="flex">
+    <button class="deposit" onclick="window.open('https://app.deriv.com/cashier/deposit','_blank')">DEPOSIT</button>
+    <button class="withdraw" onclick="window.open('https://app.deriv.com/cashier/withdrawal','_blank')">WITHDRAW</button>
+  </div>
+</div>
+
+<div class="box">
+  <h3>Digit Analysis - Live Activity Colours</h3>
+  <div class="digits" id="digits"></div>
+  <div class="legend">
+    <span><span class="dot" style="background:#4caf50"></span>Most Active</span>
+    <span><span class="dot" style="background:#2196f3"></span>2nd Most</span>
+    <span><span class="dot" style="background:#ffeb3b"></span>2nd Least</span>
+    <span><span class="dot" style="background:#ff444f"></span>Least Active</span>
+  </div>
+  <p style="text-align:center;color:#aaa;margin-top:10px">Last Digit: <b id="lastDigit">-</b> | Most Frequent: <b id="topDigit">-</b> | Least: <b id="leastDigit">-</b></p>
+</div>
+
+<div class="box">
+  <h3>Bot Settings + Entry / Exit</h3>
+  <label>Market / Pair</label>
+  <select id="market" onchange="subscribeTicks()">
+    <optgroup label="Volatility Indices">
+      <option value="R_10">Volatility 10 Index</option><option value="1HZ10V">Volatility 10 (1s) Index</option>
+      <option value="R_25">Volatility 25 Index</option><option value="1HZ25V">Volatility 25 (1s) Index</option>
+      <option value="R_50">Volatility 50 Index</option><option value="1HZ50V">Volatility 50 (1s) Index</option>
+      <option value="R_75">Volatility 75 Index</option><option value="1HZ75V">Volatility 75 (1s) Index</option>
+      <option value="R_100" selected>Volatility 100 Index</option><option value="1HZ100V">Volatility 100 (1s) Index</option>
+      <option value="1HZ150V">Volatility 150 (1s) Index</option><option value="1HZ250V">Volatility 250 (1s) Index</option>
+    </optgroup>
+    <optgroup label="Crash / Boom">
+      <option value="CRASH_300">Crash 300 Index</option><option value="CRASH_500">Crash 500 Index</option><option value="CRASH_1000">Crash 1000 Index</option>
+      <option value="BOOM_300">Boom 300 Index</option><option value="BOOM_500">Boom 500 Index</option><option value="BOOM_1000">Boom 1000 Index</option>
+    </optgroup>
+    <optgroup label="Step / Jump">
+      <option value="ST50">Step Index</option><option value="JD10">Jump 10 Index</option><option value="JD25">Jump 25 Index</option><option value="JD50">Jump 50 Index</option><option value="JD75">Jump 75 Index</option><option value="JD100">Jump 100 Index</option>
+    </optgroup>
+    <optgroup label="Forex / Commodities / Crypto">
+      <option value="frxEURUSD">EUR/USD</option><option value="frxGBPUSD">GBP/USD</option><option value="frxUSDJPY">USD/JPY</option><option value="frxAUDUSD">AUD/USD</option><option value="frxUSDCAD">USD/CAD</option><option value="frxXAUUSD">Gold</option><option value="cryBTCUSD">BTC/USD</option><option value="cryETHUSD">ETH/USD</option>
+    </optgroup>
+  </select>
+  <label>Stake ($)</label><input type="number" id="stake" value="1">
+  <label>Target Profit ($)</label><input type="number" id="target" value="50">
+  <div id="signalBox" class="signal wait">⏳ WAITING FOR SIGNAL...</div>
+  <p style="text-align:center;color:#aaa;margin-top:8px">Entry: <b id="entryPrice" style="color:white">-</b> | Exit: <b id="exitPrice" style="color:white">-</b></p>
+  <button class="start" onclick="startBot()">START BOT</button>
+  <button class="stop" onclick="stopBot()">STOP BOT</button>
+  <p id="status" style="text-align:center;margin-top:10px;color:#aaa">Bot Stopped • DEMO Mode</p>
+</div>
+
+<div class="box">
+  <h3>Recent Trades</h3>
+  <table><tr><th>Market</th><th>Stake</th><th>Entry → Exit</th><th>Result</th></tr>
+  <tbody id="history"><tr><td colspan="4" style="text-align:center;color:#aaa">No trades yet</td></tr></tbody></table>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const APP_ID = '1089';
+let running=false, totalTrades=0, wins=0, profit=0, balance=1000, account='DEMO', notify=true, ws=null, connected=false, lastPrice=0;
+let digitCounts=[0,0,0,0,0,0,0,0,0,0], totalDigits=0;
+let accounts={};
+
+function showToast(m){let t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
+function toggleNotify(){notify=!notify;document.getElementById('notifyBtn').textContent=notify?'🔔 ON':'🔕 OFF'; if(notify && 'Notification' in window) Notification.requestPermission();}
+function switchAccount(type){
+  account=type; document.getElementById('accLabel').textContent=type;
+  document.getElementById('demoBtn').classList.toggle('active',type==='DEMO');
+  document.getElementById('realBtn').classList.toggle('active',type==='REAL');
+  if(connected){ let tok=getTokenForType(type); if(tok) connectWithToken(tok); }
+  showToast('Switched to '+type);
+}
+function getTokenForType(type){
+  for(let id in accounts){ if(type==='DEMO' && id.startsWith('VRTC')) return accounts[id]; if(type==='REAL' && id.startsWith('CR')) return accounts[id]; }
+  return null;
+}
+function loginWithDeriv(){
+  let redirect = window.location.origin + window.location.pathname;
+  let url = 'https://oauth.deriv.com/oauth2/authorize?app_id='+APP_ID+'&l=en&signup_device=dashboard&redirect_uri='+encodeURIComponent(redirect);
+  window.location.href = url;
+}
+function handleHeaderLogin(){ if(connected){ logoutDeriv(); } else { loginWithDeriv(); } }
+function updateHeaderBtn(){
+  let btn=document.getElementById('headerLoginBtn');
+  if(connected){ btn.textContent='LOG OUT'; btn.classList.add('logged'); }
+  else { btn.textContent='LOG IN'; btn.classList.remove('logged'); }
+}
+function logoutDeriv(){
+  localStorage.removeItem('deriv_tokens'); accounts={}; connected=false; if(ws) ws.close();
+  document.getElementById('loginArea').style.display='block'; document.getElementById('logoutArea').style.display='none';
+  document.getElementById('apiStatus').textContent='Not logged in'; document.getElementById('loginId').textContent='-';
+  balance=1000; document.getElementById('balance').textContent='$1,000.00'; updateKsh(); updateHeaderBtn();
+}
+function updateKsh(){let r=parseFloat(document.getElementById('rate').value)||129;let usd=parseFloat(document.getElementById('usdAmt').value)||0;document.getElementById('kshOut').textContent='KSh '+(usd*r).toLocaleString();document.getElementById('balanceKsh').textContent='≈ KSh '+(balance*r).toLocaleString();document.getElementById('profitKsh').textContent='≈ KSh '+(profit*r).toLocaleString();}
+function connectWithToken(token){
+  if(!token) return;
+  document.getElementById('apiStatus').textContent='Connecting...';
+  ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id='+APP_ID);
+  ws.onopen=()=>{ ws.send(JSON.stringify({authorize:token})); };
+  ws.onmessage=(msg)=>{
+    let d=JSON.parse(msg.data);
+    if(d.msg_type==='authorize'){
+      if(d.error){document.getElementById('apiStatus').textContent='Error: '+d.error.message;return;}
+      connected=true; updateHeaderBtn();
+      document.getElementById('loginId').textContent=d.authorize.loginid;
+      document.getElementById('apiStatus').textContent='✅ Connected as '+d.authorize.loginid;
+      document.getElementById('apiStatus').style.color='#4caf50';
+      document.getElementById('loginArea').style.display='none'; document.getElementById('logoutArea').style.display='block';
+      showToast('Connected to Deriv!');
+      getBalance(); subscribeTicks();
+    }
+    if(d.msg_type==='balance'){ balance=d.balance.balance; document.getElementById('balance').textContent='$'+balance.toFixed(2); updateKsh(); }
+    if(d.msg_type==='tick'){
+      lastPrice=d.tick.quote; document.getElementById('livePrice').textContent=lastPrice;
+      let str=lastPrice.toString(); let digit=parseInt(str[str.length-1]); if(!isNaN(digit)){ digitCounts[digit]++; totalDigits++; document.getElementById('lastDigit').textContent=digit; renderDigits(); }
+    }
+    if(d.msg_type==='buy'){ if(d.error) showToast('Trade failed: '+d.error.message); else showToast('✅ Trade placed! ID: '+d.buy.contract_id); }
+  };
+}
+function getBalance(){ if(ws) ws.send(JSON.stringify({balance:1, subscribe:1})); }
+function subscribeTicks(){ if(!ws||!connected) return; ws.send(JSON.stringify({ticks:document.getElementById('market').value, subscribe:1})); }
+function renderDigits(){
+  let el=document.getElementById('digits');
+  let sorted = digitCounts.map((c,i)=>({d:i,c:c})).sort((a,b)=>b.c-a.c);
+  let most = totalDigits?sorted[0].d:-1;
+  let secondMost = totalDigits?sorted[1].d:-1;
+  let least = totalDigits?sorted[9].d:-1;
+  let secondLeast = totalDigits?sorted[8].d:-1;
+  el.innerHTML='';
+  for(let d=0;d<=9;d++){
+    let cls='c-neutral';
+    if(totalDigits){
+      if(d===most) cls='c-most';
+      else if(d===secondMost) cls='c-second-most';
+      else if(d===least) cls='c-least';
+      else if(d===secondLeast) cls='c-second-least';
+    }
+    let pct=totalDigits?Math.round(digitCounts[d]/totalDigits*100):0;
+    el.innerHTML+='<div class="digit-item"><div class="circle '+cls+'">'+d+'</div><small>'+pct+'% • '+digitCounts[d]+'</small></div>';
+  }
+  if(totalDigits){
+    document.getElementById('topDigit').textContent=most+' ('+Math.round(digitCounts/totalDigits*100)+'%)';
+    document.getElementById('leastDigit').textContent=least+' ('+Math.round(digitCounts[least]/totalDigits*100)+'%)';
+  }
+}
+renderDigits();updateKsh();updateHeaderBtn();
+
+(function autoLogin(){
+  let params=new URLSearchParams(window.location.search);
+  let found=false;
+  for(let i=1;i<=5;i++){ let acct=params.get('acct'+i); let tok=params.get('token'+i); if(acct && tok){ accounts=tok; found=true; } }
+  if(found){
+    localStorage.setItem('deriv_tokens', JSON.stringify(accounts));
+    window.history.replaceState({},'',window.location.pathname);
+    connectWithToken(getTokenForType('DEMO') || Object.values(accounts)[0]);
+    return;
+  }
+  let saved=localStorage.getItem('deriv_tokens');
+  if(saved){ accounts=JSON.parse(saved); let tok=getTokenForType('DEMO')||Object.values(accounts)[0]; if(tok) connectWithToken(tok); }
+})();
+
+function startBot(){if(running)return;running=true;document.getElementById('status').textContent='Bot Running... • '+account+' Mode';document.getElementById('status').style.color='#4caf50';showToast('Bot STARTED');runTrade();}
+function stopBot(){running=false;document.getElementById('status').textContent='Bot Stopped • '+account+' Mode';document.getElementById('status').style.color='#aaa';showToast('Bot STOPPED');}
+function runTrade(){if(!running)return;setTimeout(()=>{if(!running)return;let stake=parseFloat(document.getElementById('stake').value)||1;let entry=connected&&lastPrice?lastPrice:(1000+Math.random()*100).toFixed(2);let isBuy=Math.random()>0.5;let sigBox=document.getElementById('signalBox');sigBox.className='signal '+(isBuy?'buy':'sell');sigBox.textContent=isBuy?'🟢 BUY SIGNAL - ENTRY NOW':'🔴 SELL SIGNAL - ENTRY NOW';document.getElementById('entryPrice').textContent=entry;
+  if(connected && account==='REAL'){
+    ws.send(JSON.stringify({buy:1, price:stake, parameters:{amount:stake, basis:'stake', contract_type:isBuy?'DIGITOVER':'DIGITUNDER', currency:'USD', duration:5, duration_unit:'t', symbol:document.getElementById('market').value, barrier:'5'}}));
+  }
+  setTimeout(()=>{if(!running)return;let exit=connected&&lastPrice?lastPrice:(parseFloat(entry)+(Math.random()*20-10)).toFixed(2);document.getElementById('exitPrice').textContent=exit;let win=Math.random()>0.45;let result=win?stake*0.95:-stake;if(!connected){profit+=result;balance+=result;}else{getBalance();}totalTrades++;if(win)wins++;document.getElementById('balance').textContent='$'+balance.toFixed(2);document.getElementById('profit').textContent=(profit>=0?'+$':'-$')+Math.abs(profit).toFixed(2);updateKsh();document.getElementById('trades').textContent=totalTrades;document.getElementById('winrate').textContent=Math.round(wins/totalTrades*100)+'%';let row=document.createElement('tr');row.innerHTML='<td>'+document.getElementById('market').options[document.getElementById('market').selectedIndex].text+'</td><td>$'+stake+'</td><td>'+entry+' → '+exit+'</td><td style="color:'+(win?'#4caf50':'#ff444f')+'">'+(win?'WIN +$'+result.toFixed(2):'LOSS -$'+Math.abs(result).toFixed(2))+'</td>';let h=document.getElementById('history');if(totalTrades==1)h.innerHTML='';h.prepend(row);runTrade();},2500);},1000);}
+</script>
+</body>
+</html>
