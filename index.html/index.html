@@ -1,0 +1,124 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DERIV DASHBOARD - SHORT VOICE</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0e14;color:#fff;font-family:Arial,sans-serif;padding:12px}
+.top{display:flex;justify-content:space-between;align-items:center;background:#161a26;padding:12px;border-radius:12px}
+.top h1{font-size:18px;margin:0;color:#ff444f}.top h1 span{color:#fff}
+.btn-affiliate{background:#00c853;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:900;font-size:13px;display:inline-block;text-align:center}
+.btn-login{background:#2196f3;color:#fff;padding:10px 16px;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;border:none;width:auto;margin:0}
+.card{background:#161a26;border-radius:12px;padding:12px;margin-top:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+label{font-size:11px;color:#aaa;display:block;margin-top:8px}
+input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #333;background:#0b0e14;color:#fff;font-size:14px}
+button{width:100%;padding:13px;border:none;border-radius:10px;font-weight:900;cursor:pointer;font-size:14px;margin-top:8px}
+.btn-red{background:#ff444f;color:#fff}.btn-green{background:#00c853;color:#fff}.btn-grey{background:#2a2f42;color:#fff}.btn-blue{background:#2196f3;color:#fff}.btn-orange{background:#ff9800;color:#fff}
+.btn-small{padding:9px 12px;font-size:12px;width:auto;margin:0}
+.btn-deposit{background:#00c853;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:900;font-size:13px;display:inline-block;text-align:center;flex:1}
+.btn-withdraw{background:#ff9800;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:900;font-size:13px;display:inline-block;text-align:center;flex:1}
+.price{font-size:32px;font-weight:900;text-align:center}.sub{text-align:center;color:#aaa;font-size:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.stat{background:#0b0e14;padding:10px;border-radius:8px;text-align:center}.stat b{font-size:16px;display:block}
+#log{background:#000;color:#0f0;padding:10px;border-radius:8px;font-size:12px;white-space:pre-wrap;max-height:120px;overflow:auto;margin-top:8px}
+table{width:100%;font-size:12px;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #333;text-align:left}
+.tabs{display:flex;gap:8px}.tabs button{flex:1}.active{outline:2px solid #ff444f}
+#lockScreen{position:fixed;inset:0;background:#0b0e14;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.lockBox{background:#161a26;padding:24px;border-radius:16px;width:100%;max-width:360px;text-align:center}
+.lockBox h2{color:#ff444f;margin:0 0 5px}.lockBox p{color:#aaa;font-size:13px}
+#loginModal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9998;display:none;align-items:center;justify-content:center;padding:20px}
+.loginBox{background:#161a26;padding:20px;border-radius:16px;width:100%;max-width:360px}
+.digit-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}
+.digit-circle{aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:3px solid #333;background:#0b0e14}
+.digit-circle b{font-size:22px;line-height:1}.digit-circle span{font-size:11px;font-weight:900;margin-top:2px}
+.digit-red{border-color:#ff444f;background:#3a0d12}.digit-green{border-color:#00c853;background:#0a2e1a}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:11px}.legend span{padding:4px 8px;border-radius:20px;font-weight:700}
+.l-red{background:#ff444f;color:#fff}.l-yellow{background:#ffeb3b;color:#000}.l-green{background:#00c853;color:#fff}.l-blue{background:#2196f3;color:#fff}
+.digit-info{font-size:12px;color:#aaa;text-align:center;margin-top:8px}.digit-signal{font-size:14px;font-weight:900;text-align:center;padding:10px;border-radius:10px;margin-top:10px;background:#2a2f42}
+.scanner-wrap{overflow-x:auto}.scanner-table th{font-size:11px;color:#aaa;white-space:nowrap}.scanner-table td{white-space:nowrap;font-size:12px}
+.badge{padding:4px 8px;border-radius:20px;font-weight:900;font-size:11px;display:inline-block;text-align:center;min-width:92px}
+.badge-buy{background:#00c853;color:#fff}.badge-sell{background:#ff444f;color:#fff}.badge-wait{background:#2a2f42;color:#aaa}
+.badge-demo{background:#2196f3;color:#fff}.badge-real{background:#00c853;color:#fff}
+.scan-btn{padding:6px 10px;font-size:11px;width:auto;margin:0}
+.arrow-box{border-radius:16px;padding:18px;text-align:center;margin-top:10px;background:#2a2f42;border:3px solid #333}
+.arrow-box.rise{background:#00c853 !important;border-color:#00ff88 !important}.arrow-box.fall{background:#ff444f !important;border-color:#ff8888 !important}.arrow-box.exit{background:#ff9800 !important;border-color:#ffcc00 !important}
+.arrow-big{font-size:80px;line-height:1;display:block}.arrow-text{font-size:26px;font-weight:900;letter-spacing:1px;margin-top:4px}.arrow-sub{font-size:13px;opacity:.9;margin-top:4px}
+.sound-row{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px;font-size:12px;color:#aaa}.sound-row input{width:18px;height:18px}
+.voice-box{background:#0b0e14;border:2px solid #2196f3;border-radius:12px;padding:12px;margin-top:10px;text-align:center}
+.exit-box{background:#0b0e14;border:2px solid #ff9800;border-radius:12px;padding:12px;margin-top:10px;text-align:center}
+#voiceStatus{font-size:12px;color:#aaa;margin-top:4px}
+.topbar2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:#161a26;border-radius:12px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="lockScreen"><div class="lockBox"><h2>DERIV DASHBOARD</h2><p>Enter password to unlock</p><input id="sitePass" type="password" placeholder="Password"><button class="btn-red" onclick="unlock()">UNLOCK</button><p id="passError" style="display:none;color:#ff444f">Wrong password</p></div></div>
+<div id="loginModal"><div class="loginBox"><h3 style="margin:0">LOG IN with Deriv</h3><p style="font-size:12px;color:#aaa">Paste your Deriv API Token. Get it from Deriv > Settings > API Token. Use Demo token for Demo, Real token for Real.</p><label>Account Type</label><select id="loginAccountType"><option value="demo">Demo Account</option><option value="real">Real Account</option></select><label>API Token</label><input id="loginToken" type="password" placeholder="Paste API Token"><button class="btn-blue" onclick="loginWithToken()">CONNECT & LOG IN</button><button class="btn-grey" onclick="closeLogin()">CLOSE</button></div></div>
+<div id="mainApp" style="display:none">
+<div class="top"><h1>DERIV <span>DASHBOARD</span></h1><div style="text-align:right"><div id="status">Not Connected</div><div id="balance">Balance: -</div><div id="balanceKsh" style="font-size:12px;color:#aaa">-</div><div><span id="accountBadge" class="badge badge-demo">DEMO</span> <span id="currencyBadge" class="badge badge-wait">USD</span></div></div></div>
+<div class="topbar2">
+<div style="display:flex;gap:8px;flex:1;flex-wrap:wrap">
+<a class="btn-deposit" href="https://app.deriv.com/cashier/deposit" target="_blank" rel="noopener">💰 DEPOSIT</a>
+<a class="btn-withdraw" href="https://app.deriv.com/cashier/withdraw" target="_blank" rel="noopener">🏧 WITHDRAW</a>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn-blue btn-small" id="accountToggleBtn" onclick="toggleAccountType()">Switch to REAL</button>
+<button class="btn-grey btn-small" id="currencyToggleBtn" onclick="toggleCurrency()">Show in KSH 🇰🇪</button>
+</div>
+</div>
+<p style="font-size:11px;color:#aaa;text-align:center;margin:6px 0 0">Deposit / Withdraw opens Deriv Cashier (secure). Demo = practice money. Real = real money. 1 USD ≈ <span id="rateLabel">130</span> KSH.</p>
+<div class="card" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between"><a class="btn-affiliate" href="https://t.deriv.link?t=J92XT6AGFKD" target="_blank" rel="noopener">🚀 START TRADING ON DERIV ↗️</a><button class="btn-login" onclick="openLogin()">LOG IN</button></div>
+<div class="card"><label>App ID</label><input id="appId" value="1089"><label>API Token (<span id="tokenLabel">Demo</span> Only)</label><input id="token" type="password" placeholder="Paste Demo Token"><div class="row"><select id="market"><optgroup label="🔥 VOLATILITY INDICES"><option value="R_10">Volatility 10 Index</option><option value="R_25">Volatility 25 Index</option><option value="R_50">Volatility 50 Index</option><option value="R_75">Volatility 75 Index</option><option value="R_100" selected>Volatility 100 Index</option><option value="R_150">Volatility 150 Index</option><option value="R_250">Volatility 250 Index</option><option value="R_10_1s">Volatility 10 (1s) Index</option><option value="R_25_1s">Volatility 25 (1s) Index</option><option value="R_50_1s">Volatility 50 (1s) Index</option><option value="R_75_1s">Volatility 75 (1s) Index</option><option value="R_100_1s">Volatility 100 (1s) Index</option></optgroup><optgroup label="💥 BOOM & CRASH"><option value="BOOM300">Boom 300 Index</option><option value="BOOM500">Boom 500 Index</option><option value="BOOM1000">Boom 1000 Index</option><option value="CRASH300">Crash 300 Index</option><option value="CRASH500">Crash 500 Index</option><option value="CRASH1000">Crash 1000 Index</option></optgroup><optgroup label="📈 RANGE BREAK"><option value="RB100">Range Break 100 Index</option><option value="RB200">Range Break 200 Index</option></optgroup><optgroup label="🪜 STEP INDEX"><option value="ST100">Step Index 100</option><option value="ST200">Step Index 200</option><option value="ST500">Step Index 500</option></optgroup><optgroup label="🦘 JUMP INDICES"><option value="JD10">Jump 10 Index</option><option value="JD25">Jump 25 Index</option><option value="JD50">Jump 50 Index</option><option value="JD75">Jump 75 Index</option><option value="JD100">Jump 100 Index</option></optgroup></select><input id="stake" type="number" value="0.35" step="0.01"></div><button class="btn-red" onclick="connect()">CONNECT</button><div id="log">Log...</div></div>
+<div class="card"><h3 style="margin:0">📡 LIVE SCANNER - All Pairs</h3><div style="display:flex;gap:8px;margin-top:10px"><div class="stat" style="flex:1">Ready Now<b id="readyCount" style="color:#00c853">0</b></div><div class="stat" style="flex:1">Best Pair<b id="bestPair" style="font-size:12px">-</b></div></div><div class="scanner-wrap"><table class="scanner-table"><thead><tr><th>Pair</th><th>Price</th><th>RSI</th><th>Arrow</th><th>Least Digit</th><th>Most Digit</th><th>Digit Signal</th><th></th></tr></thead><tbody id="scannerBody"></tbody></table></div></div>
+<div class="card"><div class="price" id="price">--</div><div class="sub" id="marketName">Waiting... - Choose Volatility & Connect</div><div class="grid"><div class="stat">RSI (14)<b id="rsi">-</b></div><div class="stat">Signal<b id="rsiSignal">-</b></div><div class="stat">Win Rate<b id="winRate">-</b></div><div class="stat">P/L Today<b id="pnl">0.00</b></div></div><div id="arrowBox" class="arrow-box"><span id="arrowIcon" class="arrow-big">⏳</span><div id="arrowText" class="arrow-text">WAITING...</div><div id="arrowSub" class="arrow-sub">Connect and choose a volatility.</div></div><div class="sound-row"><input type="checkbox" id="soundOn" checked><label style="margin:0;display:inline">🔔 Beep when arrow appears</label></div><div class="row" style="margin-top:12px"><button class="btn-green" onclick="manualTrade('CALL')">⬆ TRADE RISE NOW</button><button class="btn-red" onclick="manualTrade('PUT')">⬇ TRADE FALL NOW</button></div><div class="exit-box"><b style="color:#ff9800">🚪 EXIT VOICE - Short</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center;justify-content:center"><input type="checkbox" id="exitVoiceOn" checked style="width:20px;height:20px"><span style="font-size:13px">Exit Voice ON</span></div><label>Exit when RSI comes back to</label><input id="exitRsi" type="number" value="50" min="35" max="65"><div class="row" style="margin-top:8px"><button class="btn-orange" onclick="testExitVoice()">🚪 TEST EXIT VOICE</button><button class="btn-grey" onclick="testEntryVoice()">⬆ TEST ENTRY VOICE</button></div><div id="exitStatus" style="font-size:12px;color:#aaa;margin-top:6px">Exit Voice: Ready</div></div></div>
+<div class="card"><h3 style="margin:0">🔢 DIGIT ANALYSIS - Last 100 Ticks</h3><div class="voice-box"><b>🔊 SHORT VOICE ALERTS</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center;justify-content:center"><input type="checkbox" id="voiceOn" checked style="width:20px;height:20px"><span style="font-size:13px">Voice ON</span></div><div class="row" style="margin-top:8px"><button class="btn-blue" onclick="testVoice()">🔊 TEST VOICE</button><button class="btn-grey" onclick="stopVoice()">🔇 STOP VOICE</button></div><div id="voiceStatus">Voice: Ready</div></div><div class="digit-grid" id="digitGrid"></div><div class="legend"><span class="l-red">🔴 RED = Least Active</span><span class="l-yellow">🟡 YELLOW = 2nd Least</span><span class="l-green">🟢 GREEN = Most Active</span><span class="l-blue">🔵 BLUE = 2nd Most</span></div><div class="digit-info" id="digitInfo">Waiting for ticks...</div><div class="digit-signal" id="digitSignal">DIGIT SIGNAL: WAITING...</div><div style="background:#0b0e14;border-radius:10px;padding:10px;margin-top:10px;text-align:center"><div style="font-size:12px;color:#aaa">LAST VOICE SAID:</div><div id="voiceLastSaid" style="font-size:16px;font-weight:900;margin-top:4px">- No voice yet -</div><div id="exitLastSaid" style="font-size:13px;font-weight:700;color:#ff9800;margin-top:4px"></div></div><div class="grid" style="margin-top:10px"><div class="stat">Even %<b id="evenPct">-</b></div><div class="stat">Odd %<b id="oddPct">-</b></div><div class="stat">Over 4 %<b id="overPct">-</b></div><div class="stat">Under 5 %<b id="underPct">-</b></div></div><div class="row" style="margin-top:10px"><button class="btn-green" onclick="digitTrade('DIGITOVER')">DIGIT OVER</button><button class="btn-red" onclick="digitTrade('DIGITUNDER')">DIGIT UNDER</button></div><div class="row"><button class="btn-grey" onclick="digitTrade('DIGITEVEN')">EVEN</button><button class="btn-grey" onclick="digitTrade('DIGITODD')">ODD</button></div><label>Digit for Over/Under (0-9)</label><input id="digitTarget" type="number" min="0" max="9" value="0"></div>
+<div class="card"><div class="tabs"><button id="tabManual" class="btn-grey active" onclick="setMode('manual')">MANUAL MODE</button><button id="tabAuto" class="btn-grey" onclick="setMode('auto')">AUTO BOT MODE</button></div><div id="manualBox"><button class="btn-green" onclick="manualTrade('CALL')">BUY HIGHER ⬆</button><button class="btn-red" onclick="manualTrade('PUT')">BUY LOWER ⬇</button></div><div id="autoBox" style="display:none"><label>Take Profit $</label><input id="tp" type="number" value="5"><label>Stop Loss $</label><input id="sl" type="number" value="5"><label>Martingale Multiplier</label><input id="mart" type="number" value="2" step="0.1"><button class="btn-green" id="autoBtn" onclick="toggleAuto()">START AUTO</button></div></div>
+<div class="card"><h3 style="margin:0">History</h3><table><thead><tr><th>Time</th><th>Type</th><th>Stake</th><th>Result</th></tr></thead><tbody id="history"></tbody></table></div>
+</div>
+<script>
+const SITE_PASSWORD = "@nestarAllans2424";
+let accountType='demo';
+let displayCurrency='USD';
+let usdToKsh=130;
+let currentBalanceUSD=0;
+function logMsg(m){ let l=document.getElementById('log'); if(l) l.textContent = new Date().toLocaleTimeString() + ' - ' + m + '\n' + l.textContent; }
+function unlock(){ let p=document.getElementById('sitePass').value; if(p===SITE_PASSWORD){ document.getElementById('lockScreen').style.display='none'; document.getElementById('mainApp').style.display='block'; sessionStorage.setItem('unlocked','yes'); } else { document.getElementById('passError').style.display='block'; } }
+if(sessionStorage.getItem('unlocked')==='yes'){ document.getElementById('lockScreen').style.display='none'; document.getElementById('mainApp').style.display='block'; }
+document.getElementById('sitePass').addEventListener('keyup',function(e){ if(e.key==='Enter') unlock(); });
+function openLogin(){ document.getElementById('loginModal').style.display='flex'; }
+function closeLogin(){ document.getElementById('loginModal').style.display='none'; }
+function loginWithToken(){ let t=document.getElementById('loginToken').value.trim(); if(!t){ alert('Paste your API Token first'); return; } accountType=document.getElementById('loginAccountType').value; updateAccountUI(); document.getElementById('token').value=t; closeLogin(); connect(); }
+function updateAccountUI(){
+  let badge=document.getElementById('accountBadge');
+  badge.textContent=accountType==='real'?'REAL':'DEMO';
+  badge.className='badge '+(accountType==='real'?'badge-real':'badge-demo');
+  document.getElementById('accountToggleBtn').textContent=accountType==='real'?'Switch to DEMO':'Switch to REAL';
+  document.getElementById('tokenLabel').textContent=accountType==='real'?'Real':'Demo';
+  document.getElementById('token').placeholder='Paste '+(accountType==='real'?'Real':'Demo')+' Token';
+}
+function toggleAccountType(){
+  accountType=accountType==='demo'?'real':'demo';
+  updateAccountUI();
+  logMsg('Switched to '+(accountType==='real'?'REAL':'DEMO')+' - paste '+accountType+' token and press CONNECT');
+  if(accountType==='real'){ if(!confirm('You are switching to REAL account. Real money will be used. Continue?')){ accountType='demo'; updateAccountUI(); return; } }
+  alert('Now in '+accountType.toUpperCase()+' mode. Paste your '+accountType+' API Token and press CONNECT.');
+  document.getElementById('token').value='';
+}
+function updateBalanceUI(){
+  let balEl=document.getElementById('balance');
+  let kshEl=document.getElementById('balanceKsh');
+  if(displayCurrency==='KSH'){ balEl.textContent='Balance: KSH '+(currentBalanceUSD*usdToKsh).toLocaleString('en-KE',{maximumFractionDigits:2}); kshEl.textContent='≈ $'+currentBalanceUSD.toFixed(2)+' USD'; }
+  else { balEl.textContent='Balance: $'+currentBalanceUSD.toFixed(2); kshEl.textContent='≈ KSH '+(currentBalanceUSD*usdToKsh).toLocaleString('en-KE',{maximumFractionDigits:0}); }
+  document.getElementById('currencyBadge').textContent=displayCurrency;
+  document.getElementById('currencyToggleBtn').textContent=displayCurrency==='USD'?'Show in KSH 🇰🇪':'Show in USD 💵';
+  document.getElementById('rateLabel').textContent=usdToKsh;
+}
+function toggleCurrency(){ displayCurrency=displayCurrency==='USD'?'KSH':'USD'; updateBalanceUI(); }
+let grid=document.getElementById('digitGrid');
+for(let i=0;i<=9;i++){ let d=document.createElement('div'); d.className='digit-circle'; d.id='digit-'+i; d.innerHTML=`<b>${i}</b><span>0.0%</span>`; grid.appendChild(d); }
+let lastVoiceKey='', lastVoiceTime=0, lastExitKey='', lastExitTime=0;
+function speak(text, isExit=false){
+  if(isExit){ if(!document.getElementById('exitVoiceOn').checked) return; let now=Date.now(); if(text===lastExitKey && now-lastExitTime<10000) return; lastExitKey=text; lastExitTime=now; document.getElementById('exitLastSaid').innerText='🚪 "'+text+'"'; document.getElementById('exitStatus').innerText='Exit Voice: Spoke at '+new Date().toLocaleTimeString(); }
+  else { if(!document.getElementById('voiceOn').checked) return; let now=Date.now(); if(text===lastVoiceKey && now-lastVoiceTime<8000) return; lastVoiceKey=text; lastVoiceTime=now; document.getElementById('voiceLastSaid').innerText='🔊 "'+text+'"'; document.getElementById('voiceStatus').innerText='Voice: Speaking...'; }
+  try{ window.speechSynthesis.cancel(); let u=new SpeechSynthesisUtterance(text); u.rate=1.1; u.pitch=1.0; u.volume=1.0; u.lang='en-US'; u.onend=()=>{ document.getElementById('voiceStatus').innerText='Voice: Re
